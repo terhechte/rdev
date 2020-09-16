@@ -63,7 +63,7 @@ extern "C" {
         options: CGEventTapOption,
         eventsOfInterest: CGEventMask,
         callback: QCallback,
-        user_info: id,
+        user_info: *const c_void,
     ) -> CFMachPortRef;
     pub fn CFMachPortCreateRunLoopSource(
         allocator: CFAllocatorRef,
