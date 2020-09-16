@@ -42,7 +42,7 @@ pub fn grab(callback: GrabCallback) -> Result<(), GrabError> {
             CGEventTapOption::Default,
             kCGEventMaskForAllEvents,
             raw_callback,
-            nil,
+            std::ptr::null_mut(),
         );
         if tap.is_null() {
             return Err(GrabError::EventTapError);
