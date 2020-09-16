@@ -41,7 +41,7 @@ pub fn listen(callback: Callback) -> Result<(), ListenError> {
             CGEventTapOption::ListenOnly,
             kCGEventMaskForAllEvents,
             raw_callback,
-            nil,
+            std::ptr::null_mut(),
         );
         if tap.is_null() {
             return Err(ListenError::EventTapError);
