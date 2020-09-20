@@ -240,6 +240,10 @@ pub enum EventType {
     MouseMove {
         x: f64,
         y: f64,
+#[cfg(target_os = "macos")]
+        deltaX: f64,
+#[cfg(target_os = "macos")]
+        deltaY: f64,
     },
     /// `delta_y` represents vertical scroll and `delta_x` represents horizontal scroll.
     /// Positive values correspond to scrolling up or right and negative values

@@ -51,9 +51,12 @@ unsafe fn convert_native_with_source(
             )
             .ok()
         }
-        EventType::MouseMove { x, y } => {
+        EventType::MouseMove { x, y , deltaX, deltaY} => {
             let point = CGPoint { x: (*x), y: (*y) };
-            CGEvent::new_mouse_event(source, CGEventType::MouseMoved, point, CGMouseButton::Left)
+            let mut current_point = get_current_mouse_location()?;
+            current_point.x += deltaX;
+            current_point.y += deltaY;
+            CGEvent::new_mouse_event(source, CGEventType::MouseMoved, current_point, CGMouseButton::Left)
                 .ok()
         }
         EventType::Wheel { delta_x, delta_y } => {

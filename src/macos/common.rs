@@ -100,6 +100,8 @@ pub unsafe fn convert(
             Some(EventType::MouseMove {
                 x: point.x,
                 y: point.y,
+                deltaX: 0.0,
+                deltaY: 0.0
             })
         }
         CGEventType::KeyDown => {
