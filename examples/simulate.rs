@@ -17,12 +17,12 @@ fn main() {
     send(&EventType::KeyPress(Key::KeyS));
     send(&EventType::KeyRelease(Key::KeyS));
 
-    send(&EventType::MouseMove { x: 0.0, y: 0.0 });
-    send(&EventType::MouseMove { x: 400.0, y: 400.0 });
-    send(&EventType::ButtonPress(Button::Left));
-    send(&EventType::ButtonRelease(Button::Right));
-    send(&EventType::Wheel {
-        delta_x: 0,
-        delta_y: 1,
-    });
+    //send(&EventType::MouseMove { x: 0.0, y: 0.0 });
+    //send(&EventType::MouseMove { x: 400.0, y: 400.0 });
+    //send(&EventType::ButtonPress(Button::Left));
+    //send(&EventType::ButtonRelease(Button::Right));
+    //send(&EventType::Wheel {
+    //    delta_x: 0,
+    //    delta_y: 1,
+    //});
 }

@@ -53,6 +53,8 @@ pub const kCGEventMaskForAllEvents: u64 = (1 << CGEventType::LeftMouseDown as u6
     + (1 << CGEventType::FlagsChanged as u64)
     + (1 << CGEventType::ScrollWheel as u64);
 
+pub type CGEventField = u32;
+
 #[cfg(target_os = "macos")]
 #[link(name = "Cocoa", kind = "framework")]
 extern "C" {
@@ -77,6 +79,8 @@ extern "C" {
 
     pub static kCFRunLoopCommonModes: CFRunLoopMode;
 
+    //pub fn CGEventSetIntegerValueField(event: CGEventRef, field: CGEventField, value: i64);
+
 }
 pub type QCallback = unsafe extern "C" fn(
     proxy: CGEventTapProxy,
@@ -90,11 +94,14 @@ pub unsafe fn convert(
     cg_event: &CGEvent,
     keyboard_state: &mut Keyboard,
 ) -> Option<Event> {
+    // get the integer count field
+    let value = CGEvent::get_integer_value_field(&cg_event, 1) as u8;
+
     let option_type = match _type {
-        CGEventType::LeftMouseDown => Some(EventType::ButtonPress(Button::Left)),
-        CGEventType::LeftMouseUp => Some(EventType::ButtonRelease(Button::Left)),
-        CGEventType::RightMouseDown => Some(EventType::ButtonPress(Button::Right)),
-        CGEventType::RightMouseUp => Some(EventType::ButtonRelease(Button::Right)),
+        CGEventType::LeftMouseDown => Some(EventType::ButtonPress(Button::Left(value))),
+        CGEventType::LeftMouseUp => Some(EventType::ButtonRelease(Button::Left(value))),
+        CGEventType::RightMouseDown => Some(EventType::ButtonPress(Button::Right(value))),
+        CGEventType::RightMouseUp => Some(EventType::ButtonRelease(Button::Right(value))),
         CGEventType::MouseMoved => {
             let point = cg_event.location();
             Some(EventType::MouseMove {
@@ -111,6 +118,15 @@ pub unsafe fn convert(
         CGEventType::KeyUp => {
             let code = cg_event.get_integer_value_field(EventField::KEYBOARD_EVENT_KEYCODE);
             Some(EventType::KeyRelease(key_from_code(code.try_into().ok()?)))
+        }
+        CGEventType::LeftMouseDragged => {
+            let point = cg_event.location();
+            Some(EventType::MouseDrag {
+                x: point.x,
+                y: point.y,
+                deltaX: 0.0,
+                deltaY: 0.0
+            })
         }
         CGEventType::FlagsChanged => {
             let code = cg_event.get_integer_value_field(EventField::KEYBOARD_EVENT_KEYCODE);

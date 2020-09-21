@@ -23,33 +23,37 @@ unsafe fn convert_native_with_source(
         }
         EventType::ButtonPress(button) => {
             let point = get_current_mouse_location()?;
-            let event = match button {
-                Button::Left => CGEventType::LeftMouseDown,
-                Button::Right => CGEventType::RightMouseDown,
+            let (event, count) = match button {
+                Button::Left(c) => (CGEventType::LeftMouseDown, *c),
+                Button::Right(c) => (CGEventType::RightMouseDown, *c),
+                Button::Middle(c) => (CGEventType::RightMouseDown, *c),
                 _ => return None,
             };
-            CGEvent::new_mouse_event(
+            let event = CGEvent::new_mouse_event(
                 source,
                 event,
                 point,
                 CGMouseButton::Left, // ignored because we don't use OtherMouse EventType
-            )
-            .ok()
+            );
+            event.as_ref().map(|e| CGEvent::set_integer_value_field(&e, 1, count as i64)); // 1 = kCGMouseEventClickState
+            return event.ok()
         }
         EventType::ButtonRelease(button) => {
             let point = get_current_mouse_location()?;
-            let event = match button {
-                Button::Left => CGEventType::LeftMouseUp,
-                Button::Right => CGEventType::RightMouseUp,
+            let (event, count) = match button {
+                Button::Left(c) => (CGEventType::LeftMouseUp, *c),
+                Button::Right(c) => (CGEventType::RightMouseUp, *c),
+                Button::Middle(c) => (CGEventType::RightMouseUp, *c),
                 _ => return None,
             };
-            CGEvent::new_mouse_event(
+            let event = CGEvent::new_mouse_event(
                 source,
                 event,
                 point,
                 CGMouseButton::Left, // ignored because we don't use OtherMouse EventType
-            )
-            .ok()
+            );
+            event.as_ref().map(|e| CGEvent::set_integer_value_field(&e, 1, count as i64)); // 1 = kCGMouseEventClickState
+            event.ok()
         }
         EventType::MouseMove { x, y , deltaX, deltaY} => {
             let point = CGPoint { x: (*x), y: (*y) };
@@ -57,6 +61,14 @@ unsafe fn convert_native_with_source(
             current_point.x += deltaX;
             current_point.y += deltaY;
             CGEvent::new_mouse_event(source, CGEventType::MouseMoved, current_point, CGMouseButton::Left)
+                .ok()
+        }
+        EventType::MouseDrag { x, y, deltaX, deltaY} => {
+            let point = CGPoint { x: (*x), y: (*y) };
+            let mut current_point = get_current_mouse_location()?;
+            current_point.x += deltaX;
+            current_point.y += deltaY;
+            CGEvent::new_mouse_event(source, CGEventType::LeftMouseDragged, current_point, CGMouseButton::Left)
                 .ok()
         }
         EventType::Wheel { delta_x, delta_y } => {

@@ -217,9 +217,9 @@ pub enum Key {
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[cfg_attr(feature = "serialize", derive(Serialize, Deserialize))]
 pub enum Button {
-    Left,
-    Right,
-    Middle,
+    Left(u8),
+    Right(u8),
+    Middle(u8),
     Unknown(u8),
 }
 
@@ -238,6 +238,14 @@ pub enum EventType {
     /// Values in pixels. `EventType::MouseMove{x: 0, y: 0}` corresponds to the
     /// top left corner, with x increasing downward and y increasing rightward
     MouseMove {
+        x: f64,
+        y: f64,
+#[cfg(target_os = "macos")]
+        deltaX: f64,
+#[cfg(target_os = "macos")]
+        deltaY: f64,
+    },
+    MouseDrag {
         x: f64,
         y: f64,
 #[cfg(target_os = "macos")]

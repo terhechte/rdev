@@ -53,8 +53,8 @@ fn test_listen_and_simulate() -> Result<(), Box<dyn Error>> {
         //EventType::KeyPress(Key::ShiftLeft),
         EventType::KeyPress(Key::KeyS),
         EventType::KeyRelease(Key::KeyS),
-        EventType::ButtonPress(Button::Right),
-        EventType::ButtonRelease(Button::Right),
+        EventType::ButtonPress(Button::Right(1)),
+        EventType::ButtonRelease(Button::Right(1)),
         EventType::Wheel {
             delta_x: 0,
             delta_y: 1,
@@ -68,6 +68,8 @@ fn test_listen_and_simulate() -> Result<(), Box<dyn Error>> {
     let click_events = (0..480).map(|pixel| EventType::MouseMove {
         x: pixel as f64,
         y: pixel as f64,
+        deltaX: 0.0,
+        deltaY: 0.0
     });
     let mut events = events.chain(click_events);
     sim_then_listen(&mut events)
